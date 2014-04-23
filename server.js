@@ -1,6 +1,6 @@
 var WebSocket = require('ws')
   , WebSocketServer = WebSocket.Server
-  , wss = new WebSocketServer({port: 8080});
+  , wss = new WebSocketServer({port: 8000});
 
 var tokens = {};
 
@@ -50,6 +50,7 @@ function check_solution(token, solution) {
 }
 
 function authenticate(ws, data) {
+
     if (!data.hasOwnProperty('token')) {
         ws.send('Please supply me with a token')
         return false
@@ -59,7 +60,6 @@ function authenticate(ws, data) {
         ws.send('Sorry, your token is wrong');
         return false
     }
-
     return true
 }
 
@@ -89,7 +89,9 @@ function message_solution(ws, data) {
 }
 
 wss.on('connection', function(ws) {
+
     ws.on('message', function(message) {
+      console.log("do i loop here?");
         console.log("< " + message)
 
         var data = {}
@@ -111,16 +113,17 @@ wss.on('connection', function(ws) {
             ws.send(JSON.stringify({'token': token}))
             return
         }
-
         if (!authenticate(ws, data)) {
             return
         }
-
+        console.log("after auth");
         if (data['please'] == "let me do the challenge") {
+            console.log("sending challenge!");
             message_challenge(ws, data);
         } else if (data['please'] == "I have the solution"){
             message_solution(ws,data);
         }
+
     });
 
     ws.on('close', function() {
@@ -128,4 +131,3 @@ wss.on('connection', function(ws) {
         delete_token(ws);
     });
 });
-
