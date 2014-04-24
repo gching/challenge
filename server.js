@@ -1,6 +1,6 @@
 var WebSocket = require('ws')
   , WebSocketServer = WebSocket.Server
-  , wss = new WebSocketServer({port: 8000});
+  , wss = new WebSocketServer({port: 8080});
 
 var tokens = {};
 

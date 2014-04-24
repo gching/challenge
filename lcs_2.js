@@ -1,31 +1,10 @@
-// client.js
-// April 22, 2014
-// Gavin Ching
-// Used to test server given from the challenge from Ubergrape
-
-var WebSocket = require('ws')
-  , ws = new WebSocket('ws://localhost:8000');
-
-// Global token variable
-var globalToken = {};
-
-// Set the token
-function set_token(given_token) {
-  globalToken["current"] = given_token;
-  return;
-}
-
-// To see if its undefined.
-function isDefined(x) {
-  var undefined;
-  return x !== undefined;
-}
+// lcs.js
+// April 23, 2014
+// Gavin Ching'
+// Solving the LCS problem in javascript.
 
 
-// To figure longest common subsequence given in the parameters.
-// Returns the length of the LCS.
-// Challenge accepted UberGrape.
-function challenge_accepted(a, b){
+function lcs(a, b){
   // Get the lengths of the two strings inputted.
   var n = a.length;
   var m = b.length;
@@ -40,7 +19,6 @@ function challenge_accepted(a, b){
   // Preset the base case when it reaches the 0 indexes to be a 0\
   for(var i = 1; i<=n; i++){
     commonLength[i][0] = 0;
-
   }
   for(var i = 0; i<=m; i++){
     commonLength[0][i] = 0;
@@ -73,48 +51,14 @@ function challenge_accepted(a, b){
       }
     }
   }
+
   // Last index of the two dimensional array contains the LCS.
   return commonLength[n][m];
 }
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
 
-
-// Open up connection and sending let me in!!!
-ws.on('open', function() {
-
-  // Send let me in message!
-  ws.send(JSON.stringify({'please': "let me in"}));
-
-
-});
-
-// Recieve messages sent back from server.
-ws.on('message', function(message) {
-  var data = {};
-  //var token = null;
-  console.log("recieved %s", message)
-  // Message is the recieved token in JSON. Extract it into the token variable
-  // Assumption is it does return a valid to token!
-  data = JSON.parse(message);
-
-  // If token is defined, take it and save it in global variable.
-  // After send the challenge UberGrape wants me to do!
-  if (isDefined(data["token"])){
-    console.log("Recieved token %s", data['token']);
-    set_token(data['token']);
-    //token = data["token"];
-    console.log('My current token is %s', globalToken["current"]);
-    // Send dat challenge :>.
-    ws.send(
-      JSON.stringify({"token": globalToken["current"],
-      "please": "let me do the challenge"})
-    );
-  }
-
-  // Bring it on!
-  if (isDefined(data["challenge"])){
-    console.log(challenge_accepted(data["challenge"]["a"], data["challenge"]["b"]));
-  }
-
-
-
+process.stdin.on('data', function (chunk) {
+ lines = chunk.split('\n');
+ console.log(lcs(lines[0],lines[1]));
 });
