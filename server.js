@@ -9,7 +9,7 @@ function generate_token() {
 }
 
 function generate_challenge_string(){
-    return random_choice(64, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    return random_choice(40, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 }
 
 function random_choice(length, possible) {
@@ -77,6 +77,7 @@ function message_challenge(ws, data) {
 
 function message_solution(ws, data) {
     if (!data.hasOwnProperty('solution')) {
+
         ws.send("Sorry, you must provide a solution")
         return
     }
@@ -84,6 +85,7 @@ function message_solution(ws, data) {
     if (check_solution(data.token, data.solution)) {
         ws.send("Thank you")
     } else {
+        console.log("Got Solution but WRONG: you sent "+ data.solution + "but answer is" + tokens[data.token].solution);
         message_challenge(ws, data);
     }
 }
@@ -116,11 +118,13 @@ wss.on('connection', function(ws) {
         if (!authenticate(ws, data)) {
             return
         }
-        console.log("after auth");
+
         if (data['please'] == "let me do the challenge") {
+
             console.log("sending challenge!");
             message_challenge(ws, data);
         } else if (data['please'] == "I have the solution"){
+          console.log("Before Checking");
             message_solution(ws,data);
         }
 

@@ -4,7 +4,7 @@
 // Used to test server given from the challenge from Ubergrape
 
 var WebSocket = require('ws')
-  , ws = new WebSocket('ws://localhost:8000');
+  , ws = new WebSocket('ws://localhost:8080');
 
 // Global token variable
 var globalToken = {};
@@ -94,7 +94,12 @@ ws.on('message', function(message) {
   console.log("recieved %s", message)
   // Message is the recieved token in JSON. Extract it into the token variable
   // Assumption is it does return a valid to token!
-  data = JSON.parse(message);
+  try{
+    data = JSON.parse(message)
+  }catch(e){
+    console.log(message);
+    return;
+  }
 
   // If token is defined, take it and save it in global variable.
   // After send the challenge UberGrape wants me to do!
@@ -105,14 +110,16 @@ ws.on('message', function(message) {
     console.log('My current token is %s', globalToken["current"]);
     // Send dat challenge :>.
     ws.send(
-      JSON.stringify({"token": globalToken["current"],
-      "please": "let me do the challenge"})
+      JSON.stringify({"token": globalToken["current"],"please": "let me do the challenge"})
     );
+    console.log("SENDING CHALLENGE");
   }
 
   // Bring it on!
   if (isDefined(data["challenge"])){
-    console.log(challenge_accepted(data["challenge"]["a"], data["challenge"]["b"]));
+
+    var bigResult = challenge_accepted(data["challenge"]["a"], data["challenge"]["b"]);
+    ws.send(JSON.stringify({"token": globalToken["current"],"please": "I have the solution","solution": bigResult}));
   }
 
 

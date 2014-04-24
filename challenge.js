@@ -19,17 +19,19 @@ var challengeFunc = function() {
           //var token = null;
           // Message is the recieved token in JSON. Extract it into the token variable
           // Assumption is it does return a valid to token!
-
-          data = JSON.parse(message.data);
+          try{
+            data = JSON.parse(message.data)
+          }catch(e){
+            var thanks =  document.querySelector('div#thanks');
+            thanks.innerHTML = message.data;
+            return;
+          }
 
 
           // If token is defined, take it and save it in global variable.
           // After send the challenge UberGrape wants me to do!
           if (isDefined(data["token"])){
-            console.log("Recieved token %s", data['token']);
             set_token(data['token']);
-            //token = data["token"];
-            console.log('My current token is %s', globalToken["current"]);
             // Send dat challenge :>.
             ws.send(
               JSON.stringify({"token": globalToken["current"],
@@ -39,9 +41,11 @@ var challengeFunc = function() {
 
           // Bring it on!
           if (isDefined(data["challenge"])){
-            yolo =  document.querySelector('div#yolo');
-            yolo.innerHTML = "Result is " +
+            var bigResult =
             challenge_accepted(data["challenge"]["a"], data["challenge"]["b"]);
+            yolo =  document.querySelector('div#yolo');
+            yolo.innerHTML = "Result is " + "<strong>" + bigResult +"</strong>" + " from string "
+            + data["challenge"]["a"] + " and " + data["challenge"]["b"];
 
           }
 
